@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="inherit_view_customer_form" model="ir.ui.view">
+		<field name="name">res.partner.form</field>
+		<field name="model">res.partner</field>
+		<field name="inherit_id" ref="base.view_partner_form"/>
+		<field name="arch" type="xml">
+		<xpath expr ="//field[@name='type']" position="before">	
+			<field name ="customer"/>
+			<field name ="supplier"/>
+		</xpath>
+
+		    <xpath expr="//notebook" position="inside">
+
+		    
+		    <!-->>>>>>>>>>>>>>>>>>>>>Customer Statement<<<<<<<<<<<<<<<<<<<<<<<<<  -->
+		    
+		    	<page string="Customer Statement">
+		    		<field name="cus_overdue_statement" invisible="1" />
+		    		<field name="customer_statement" invisible="1" />
+		    		<group>
+		            <div class="o_row" >
+		            	<button name="action_customer_statement" type="object" class="oe_highlight" string="Customer Statement"/>
+		            	<button name="action_cus_overdue_statement" type="object" class="oe_highlight" string="Overdue Statement" />
+
+		            	<button name="action_customer_statement_print" type="object" class="oe_highlight" string="Print Account Statement"/>
+		            	<button name="action_customer_statement_send" type="object" class="oe_highlight" string="Send Account Statement" />
+			    		<button name="action_cus_overdue_statement_print" type="object" class="oe_highlight" string="Print Overdue Payments"/>
+		            	<button name="action_cus_overdue_statement_send" type="object" class="oe_highlight" string="Send Overdue Payments" />
+		            </div>
+		            </group>
+		            <group string="Filter By Date">
+		            	<label for="filter_by"/>
+						<div class="o_row" >
+							<field name="filter_by" class="oe_inline" />
+							From <field name="period_from" class="oe_inline" />
+							To <field name="period_to" class="oe_inline" />
+							Days Length <field name="ageing_length" class="oe_inline" />
+						</div>
+					</group>
+					
+					<!-->>>>>>>>>>>>>>>>>>>>>Customer Statement<<<<<<<<<<<<<<<<<<<<<<<<<  -->
+					
+					<separator string="Customer Statement" attrs="{'invisible': [('customer_statement', '!=', True)]}" />
+					<field name="cus_account_ids" style="text-align: right;" attrs="{'invisible': [('customer_statement', '!=', True)]}" >
+						<tree default_order='name'>
+							<field name="new_date_invoice" string="Invoice Date" />
+							<field name="name" />
+							<field name="new_company_id" string="Company" />
+							<field name="new_date_due" string="Due Date" />
+							<field name="amount_total" string="Invoices" sum="Total" />
+							<field name="paid_amount" sum="Total" />
+							<field name="amount_residual" sum="Total" string="Balance"/>
+						</tree>
+					</field>
+					<separator string="Payments" attrs="{'invisible': [('customer_statement', '!=', True)]}" />
+					<field name="cus_payment_ids" style="text-align: right;" attrs="{'invisible': [('customer_statement', '!=', True)]}" >
+						<tree>
+							<field name="date" string="Payment Date" />
+							<field name="name" string="Number"/>
+							<field name="company_id" string="Company" />
+							<field name="ref" string="Memo"/>
+							<field name="move_id" />
+							<field name="state" invisible="1"/>
+							<field name="amount" string="Payment Amount" sum="Total" />
+						</tree>
+					</field>
+					
+					<!-->>>>>>>>>>>>>>>>>>>>>Customer Overdue Statement<<<<<<<<<<<<<<<<<<<<<<<<<  -->
+					
+					<separator string="Customer Overdue Statement" attrs="{'invisible': [('cus_overdue_statement', '!=', True)]}" />
+					<field name="cus_overdue_ids" style="text-align: right;" attrs="{'invisible': [('cus_overdue_statement', '!=', True)]}" >
+						<tree default_order='name'>
+							<field name="new_date_invoice" string="Invoice Date" />
+							<field name="name" />
+							<field name="new_company_id" string="Company" />
+							<field name="new_date_due" string="Due Date" />
+							<field name="amount_total" string="Invoices" sum="Total" />
+							<field name="paid_amount" sum="Total" />
+							<field name="amount_residual" sum="Total" string="Balance"/>
+						</tree>
+					</field>
+					<separator string="Payments" attrs="{'invisible': [('cus_overdue_statement', '!=', True)]}" />
+					<field name="cus_payment_ids" style="text-align: right;" attrs="{'invisible': [('cus_overdue_statement', '!=', True)]}" >
+						<tree>
+							<field name="date" string="Payment Date" />
+							<field name="name" string="Number"/>
+							<field name="company_id" string="Company" />
+							<field name="ref" string="Memo"/>
+							<field name="move_id" />
+							<field name="state" invisible="1"/>
+							<field name="amount" string="Payment Amount" sum="Total" />
+						</tree>
+					</field>
+		    	</page>
+		    	
+		    	<!-->>>>>>>>>>>>>>>>>>>>>Supplier Details<<<<<<<<<<<<<<<<<<<<<<<<<  -->
+		    	
+		    	<page string="Supplier Statement" attrs="{'invisible': [('supplier', '!=', True)]}">
+		    		<field name="sup_overdue_statement" invisible="1" />
+		    		<field name="supplier_statement" invisible="1" />
+		    		<group>
+		            <div class="o_row" >
+		            	<button name="action_supplier_statement" type="object" class="oe_highlight" string="Supplier Statement"/>
+		            	<button name="action_sup_overdue_statement" type="object" class="oe_highlight" string="Overdue Statement" />
+
+		            	<button name="action_supplier_statement_print" type="object" class="oe_highlight" string="Print Account Statement"/>
+		            	<button name="action_supplier_statement_send" type="object" class="oe_highlight" string="Send Account Statement" />
+			    		<button name="action_sup_overdue_statement_print" type="object" class="oe_highlight" string="Print Overdue Payments"/>
+			    		<button name="action_sup_overdue_statement_send" type="object" class="oe_highlight" string="Send Overdue Payments" />
+		            </div>
+		            </group>
+		            <group string="Filter By Date">
+		            	<label for="sup_filter_by" string="Filter By"/>
+						<div class="o_row" >
+							<field name="sup_filter_by" class="oe_inline" />
+							From <field name="sup_period_from" class="oe_inline" />
+							To <field name="sup_period_to" class="oe_inline" />
+							Days Length <field name="sup_ageing_length" class="oe_inline" />
+						</div>
+					</group>
+
+					<!-->>>>>>>>>>>>>>>>>>>>>Supplier Statement<<<<<<<<<<<<<<<<<<<<<<<<<  -->
+
+					<separator string="Supplier Statement" attrs="{'invisible': [('supplier_statement', '!=', True)]}" />
+					<field name="sup_account_ids" style="text-align: right;" attrs="{'invisible': [('supplier_statement', '!=', True)]}" >
+						<tree default_order='name'>
+							<field name="new_date_invoice" string="Bill Date" />
+							<field name="name" string="Bill Number" />
+							<field name="new_company_id" string="Company" />
+							<field name="new_date_due" string="Due Date" />
+							<field name="amount_total" string="Invoices" sum="Total" />
+							<field name="paid_amount" sum="Total" />
+							<field name="amount_residual" sum="Total" string="Balance"/>
+						</tree>
+					</field>
+					<separator string="Payments" attrs="{'invisible': [('supplier_statement', '!=', True)]}" />
+					<field name="sup_payment_ids" style="text-align: right;" attrs="{'invisible': [('supplier_statement', '!=', True)]}" >
+						<tree>
+							<field name="date" string="Payment Date" />
+							<field name="name" string="Bill Number"/>
+							<field name="company_id" string="Company" />
+							<field name="ref" string="Memo"/>
+							<field name="move_id" />
+							<field name="state" invisible="1"/>
+							<field name="amount" string="Payment Amount" sum="Total" />
+						</tree>
+					</field>
+
+					<!-->>>>>>>>>>>>>>>>>>>>>Supplier Overdue Statement<<<<<<<<<<<<<<<<<<<<<<<<<  -->
+
+					<separator string="Supplier Overdue Statement" attrs="{'invisible': [('sup_overdue_statement', '!=', True)]}" />
+					<field name="sup_overdue_ids" style="text-align: right;" attrs="{'invisible': [('sup_overdue_statement', '!=', True)]}" >
+						<tree default_order='name' >
+							<field name="new_date_invoice" string="Bill Date" />
+							<field name="name" string="Bill Number" />
+							<field name="new_company_id" string="Company" />
+							<field name="new_date_due" string="Due Date" />
+							<field name="amount_total" string="Invoices" sum="Total" />
+							<field name="paid_amount" sum="Total" />
+							<field name="amount_residual" sum="Total" string="Balance"/>
+						</tree>
+					</field>
+					<separator string="Payments" attrs="{'invisible': [('sup_overdue_statement', '!=', True)]}" />
+					<field name="sup_payment_ids" style="text-align: right;" attrs="{'invisible': [('sup_overdue_statement', '!=', True)]}" >
+						<tree>
+							<field name="date" string="Payment Date" />
+							<field name="name" string="Bill Number"/>
+							<field name="company_id" string="Company" />
+							<field name="ref" string="Memo"/>
+							<field name="move_id" />
+							<field name="state" invisible="1"/>
+							<field name="amount" string="Payment Amount" sum="Total" />
+						</tree>
+					</field>
+
+		    	</page>
+		    </xpath>
+		</field>
+	</record>
+	
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
