@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- QWeb Reports -->
+    <record id="action_partner_statements_reports" model="ir.actions.report">
+        <field name="name">Partner Report</field>
+        <field name="model">res.partner</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">partner_outstanding_info.report_partner_statements</field>
+        <field name="report_file">partner_outstanding_info.report_partner_statements</field>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+</odoo>

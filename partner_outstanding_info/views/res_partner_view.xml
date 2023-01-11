@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <!-- Page For Customer Statements -->
+            <xpath expr="//page[@name='internal_notes']" position="after">
+                <page name="customer_statement" string="Customer Statement">
+                    <group attrs="{'invisible':[('customer_invoice_ids','=',[])]}">
+                        <group class="mb-4 mt-4" style="white-space: nowrap">
+                            <button string='Print Statement' name="customer_report" type="object" default_focus="1" class="oe_highlight" style="white-space: nowrap"/>
+                        </group>
+                    </group>
+                    <h1> Customer Statement</h1>
+                    <field name="customer_invoice_ids">
+                        <tree stirng="invoice_details">
+                            <field name='invoice_date' />
+                            <field name='state' invisible="1" />
+                            <field name='name' width='100px' />
+                            <field name='invoice_date_due' />
+                            <field name='amount_total' string='Invoice Amount' width='100px' />
+                            <field name='payment_amount' string='Amount Paid' width='100px' />
+                            <field name='amount_residual' string='Balance' />
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name='customer_overdue_amount' />
+                        </group>
+                        <group>
+                            <field name='customer_balance_amount' />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <!-- Page For Vendor Statements -->
+            <xpath expr="//page[@name='customer_statement']" position="after">
+                <page name="vendor_statement" string="Vendor Statement">
+                    <group attrs="{'invisible':[('vendor_bill_ids','=',[])]}">
+                        <group class="mb-4 mt-4" style="white-space: nowrap">
+                            <button string='Print Statement' name="vendor_report" type="object" default_focus="1" class="oe_highlight" />
+                        </group>
+                    </group>
+                    <h1> Vendor Statement</h1>
+                    <field name="vendor_bill_ids">
+                        <tree stirng="bill_details">
+                            <field name='invoice_date' />
+                            <field name='state' invisible="1" />
+                            <field name='name' width='100px' />
+                            <field name='invoice_date_due' />
+                            <field name='amount_total' string='Bill Amount' width='100px' />
+                            <field name='payment_amount' string='Amount Paid' width='100px' />
+                            <field name='amount_residual' string='Balance' />
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name='vendor_overdue_amount' string='Total Overdue Amount' />
+                        </group>
+                        <group>
+                            <field name='vendor_balance_amount' string='Total Outstanding Balance' />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
