@@ -12,6 +12,7 @@
     "license" : "OPL-1",
     "depends": ['account_reports'],
     "data": [
+        # 'data/partner_ledger.xml',
     ],
     "installable": True,
     "auto_install": False,
