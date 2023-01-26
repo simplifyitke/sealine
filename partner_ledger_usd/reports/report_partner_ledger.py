@@ -35,7 +35,7 @@ class MultiReportPartnerLedger(models.AbstractModel):
                 'no_format': value,
                 'class': 'number'
             })
-
+        print (column_values)
         return {
             'id': report._get_generic_line_id(None, None, markup='total'),
             'name': _('Total'),
@@ -67,18 +67,14 @@ class MultiReportPartnerLedger(models.AbstractModel):
                 partner_values[column_group_key]['credit'] = self.convert_to_usd(partner_sum.get('credit', 0.0))
                 partner_values[column_group_key]['balance'] = self.convert_to_usd(partner_sum.get('balance', 0.0))
 
-                totals_by_column_group[column_group_key]['debit'] += self.convert_to_usd(
-                    partner_values[column_group_key]['debit'])
-                totals_by_column_group[column_group_key]['credit'] += self.convert_to_usd(
-                    partner_values[column_group_key]['credit'])
-                totals_by_column_group[column_group_key]['balance'] += self.convert_to_usd(
-                    partner_values[column_group_key]['balance'])
+                totals_by_column_group[column_group_key]['debit'] += partner_values[column_group_key]['debit']
+                totals_by_column_group[column_group_key]['credit'] += partner_values[column_group_key]['credit']
+                totals_by_column_group[column_group_key]['balance'] += partner_values[column_group_key]['balance']
 
             lines.append((0, self._get_report_line_partners(options, partner, partner_values)))
 
         # Report total line.
         lines.append((0, self._get_report_line_total(options, totals_by_column_group)))
-        print (lines)
         return lines
 
     def _report_expand_unfoldable_line_partner_ledger(self, line_dict_id, groupby, options, progress, offset,
