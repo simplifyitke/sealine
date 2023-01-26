@@ -1,3 +1,9 @@
 <odoo>
-        <delete model="account.report.column" search="[('id','=',ref('account_reports.partner_ledger_report_amount_currency').id]"/>
+<!--        <record id="account_reports.partner_ledger_report_amount_currency" model="account.report.column">-->
+<!--                <field name="name">Amount Currency</field>-->
+<!--                <field name="expression_label">amount_currency_none</field>-->
+<!--                <field name="figure_type">monetary</field>-->
+<!--                <field name="blank_if_zero" eval="True"/>-->
+<!--            </record>-->
+        <delete model="account.report.column" search="[('expression_label','=','amount_currency')]"/>
 </odoo>

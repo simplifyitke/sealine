@@ -13,7 +13,6 @@ class MultiReportPartnerLedger(models.AbstractModel):
         date = fields.Datetime.today()
         currency = self.env['res.currency'].search([('name', '=', 'USD')])
         amount_after = self.env.user.company_id.currency_id._convert(amount, currency, self.env.user.company_id, date)
-        print("Amount.....................", amount, amount_after)
         return amount_after
 
     def _get_report_line_total(self, options, totals_by_column_group):
