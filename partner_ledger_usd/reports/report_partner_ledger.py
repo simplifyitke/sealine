@@ -79,7 +79,7 @@ class MultiReportPartnerLedger(models.AbstractModel):
 
         # Report total line.
         lines.append((0, self._get_report_line_total(options, totals_by_column_group)))
-
+        print (lines)
         return lines
 
     def _report_expand_unfoldable_line_partner_ledger(self, line_dict_id, groupby, options, progress, offset,
@@ -116,9 +116,9 @@ class MultiReportPartnerLedger(models.AbstractModel):
                     amount_usd =  convert_initial_balance(amount)
                     return report.format_value(amount_usd, currency=usd_currency,
                                                       figure_type='monetary')
-
-                # initial_balance_line['columns'] = [{'name': format_initial_balance(initial_dict.get('no_format')),
-                #                                     'no_format': convert_initial_balance(initial_dict.get('no_format')),'class': 'number'} if initial_dict.get('class') == 'number' else initial_dict for initial_dict in initial_balance_line['columns'] ]
+                ##NOTE: Do not convert  no_format value otherwise it messes up with calculations
+                initial_balance_line['columns'] = [{'name': format_initial_balance(initial_dict.get('no_format')),
+                                                    'no_format': initial_dict.get('no_format'),'class': 'number'} if initial_dict.get('class') == 'number' else initial_dict for initial_dict in initial_balance_line['columns'] ]
                 lines.append(initial_balance_line)
 
                 # For the first expansion of the line, the initial balance line gives the progress
@@ -181,7 +181,6 @@ class MultiReportPartnerLedger(models.AbstractModel):
                 elif col_expr_label == 'amount_currency':
                     usd_currency = self.env['res.currency'].search([('name', '=', 'USD')])
                     usd_value = self.convert_to_usd(col_value)
-                    print("CONVERTED.....", usd_value, col_value)
                     formatted_value = report.format_value(usd_value, currency=usd_currency,
                                                           figure_type=column['figure_type'])
                 elif col_expr_label == 'balance':
