@@ -15,6 +15,12 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
     _inherit = 'account.report.custom.handler'
     _description = 'Partner Ledger Custom Handler'
 
+    def convert_to_usd(self, amount):
+        date = fields.Datetime.today()
+        currency = self.env['res.currency'].search([('name', '=', 'USD')])
+        amount_after = self.env.user.company_id.currency_id._convert(amount, currency, self.env.user.company_id, date)
+        return amount_after
+
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals):
         if self.env.context.get('print_mode') and options.get('filter_search_bar'):
             # Handled here instead of in custom options initializer as init_options functions aren't re-called when printing the report.
@@ -34,9 +40,9 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             for column_group_key in options['column_groups']:
                 partner_sum = results.get(column_group_key, {})
 
-                partner_values[column_group_key]['debit'] = partner_sum.get('debit', 0.0)
-                partner_values[column_group_key]['credit'] = partner_sum.get('credit', 0.0)
-                partner_values[column_group_key]['balance'] = partner_sum.get('balance', 0.0)
+                partner_values[column_group_key]['debit'] = self.convert_to_usd(partner_sum.get('debit', 0.0))
+                partner_values[column_group_key]['credit'] = self.convert_to_usd(partner_sum.get('credit', 0.0))
+                partner_values[column_group_key]['balance'] = self.convert_to_usd(partner_sum.get('balance', 0.0))
 
                 totals_by_column_group[column_group_key]['debit'] += partner_values[column_group_key]['debit']
                 totals_by_column_group[column_group_key]['credit'] += partner_values[column_group_key]['credit']
@@ -277,11 +283,12 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
 
         return " UNION ALL ".join(queries), params
 
-    def _report_expand_unfoldable_line_partner_ledger(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_partner_ledger(self, line_dict_id, groupby, options, progress, offset,
+                                                      unfold_all_batch_data=None):
         def init_load_more_progress(line_dict):
             return {
                 column['column_group_key']: line_col.get('no_format', 0)
-                for column, line_col in  zip(options['columns'], line_dict['columns'])
+                for column, line_col in zip(options['columns'], line_dict['columns'])
                 if column['expression_label'] == 'balance'
             }
 
@@ -299,14 +306,16 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 init_balance_by_col_group = unfold_all_batch_data['initial_balances'][record_id]
             else:
                 init_balance_by_col_group = self._get_initial_balance_values([record_id], options)[record_id]
-            initial_balance_line = report._get_partner_and_general_ledger_initial_balance_line(options, line_dict_id, init_balance_by_col_group)
+            initial_balance_line = report._get_partner_and_general_ledger_initial_balance_line(options, line_dict_id,
+                                                                                               init_balance_by_col_group)
             if initial_balance_line:
                 lines.append(initial_balance_line)
 
                 # For the first expansion of the line, the initial balance line gives the progress
                 progress = init_load_more_progress(initial_balance_line)
 
-        limit_to_load = report.load_more_limit + 1 if report.load_more_limit and not self._context.get('print_mode') else None
+        limit_to_load = report.load_more_limit + 1 if report.load_more_limit and not self._context.get(
+            'print_mode') else None
 
         if unfold_all_batch_data:
             aml_results = unfold_all_batch_data['aml_values'][record_id]
@@ -502,7 +511,12 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             value = partner_values[column['column_group_key']].get(col_expr_label)
 
             if col_expr_label in {'debit', 'credit', 'balance'}:
-                formatted_value = report.format_value(value, figure_type=column['figure_type'], blank_if_zero=column['blank_if_zero'])
+                usd_currency = self.env['res.currency'].search([('name', '=', 'USD')])
+                # Amount is already converted to USD
+                # usd_value = self.convert_to_usd(value)
+                formatted_value = report.format_value(value, currency=usd_currency,
+                                                      figure_type=column['figure_type'],
+                                                      blank_if_zero=column['blank_if_zero'])
             else:
                 formatted_value = report.format_value(value, figure_type=column['figure_type']) if value is not None else value
 
@@ -551,17 +565,30 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                     formatted_value = format_date(self.env, fields.Date.from_string(col_value))
                     col_class = 'date'
                 elif col_expr_label == 'amount_currency':
-                    currency = self.env['res.currency'].browse(aml_query_result['currency_id'])
-                    formatted_value = report.format_value(col_value, currency=currency, figure_type=column['figure_type'])
+                    usd_currency = self.env['res.currency'].search([('name', '=', 'USD')])
+                    usd_value = self.convert_to_usd(col_value)
+                    formatted_value = report.format_value(usd_value, currency=usd_currency,
+                                                          figure_type=column['figure_type'])
                 elif col_expr_label == 'balance':
                     col_value += init_bal_by_col_group[column['column_group_key']]
-                    formatted_value = report.format_value(col_value, figure_type=column['figure_type'], blank_if_zero=column['blank_if_zero'])
+                    usd_currency = self.env['res.currency'].search([('name', '=', 'USD')])
+                    usd_value = self.convert_to_usd(col_value)
+                    formatted_value = report.format_value(usd_value, currency=usd_currency,
+                                                          figure_type=column['figure_type'],
+                                                          blank_if_zero=column['blank_if_zero'])
                 else:
                     if col_expr_label == 'ref':
                         col_class = 'o_account_report_line_ellipsis'
                     elif col_expr_label not in ('debit', 'credit'):
                         col_class = ''
-                    formatted_value = report.format_value(col_value, figure_type=column['figure_type'])
+                    ########## BS #############
+                    usd_currency = self.env['res.currency'].search([('name', '=', 'USD')])
+                    usd_value = col_value
+                    if isinstance(usd_value, (int, float)):
+                        usd_value = self.convert_to_usd(col_value)
+                    formatted_value = report.format_value(usd_value, currency=usd_currency,
+                                                          figure_type=column['figure_type'])
+                    ########## BS #############
 
                 columns.append({
                     'name': formatted_value,
@@ -587,7 +614,10 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             value = totals_by_column_group[column['column_group_key']].get(column['expression_label'])
 
             if col_expr_label in {'debit', 'credit', 'balance'}:
-                formatted_value = report.format_value(value, figure_type=column['figure_type'], blank_if_zero=False)
+                usd_currency = self.env['res.currency'].search([('name', '=', 'USD')])
+                ## Value is already converted in USD
+                formatted_value = report.format_value(value, currency=usd_currency, figure_type=column['figure_type'],
+                                                      blank_if_zero=False)
             else:
                 formatted_value = report.format_value(value, figure_type=column['figure_type']) if value else None
 
