@@ -309,8 +309,22 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             initial_balance_line = report._get_partner_and_general_ledger_initial_balance_line(options, line_dict_id,
                                                                                                init_balance_by_col_group)
             if initial_balance_line:
-                lines.append(initial_balance_line)
+                usd_currency = self.env['res.currency'].search([('name', '=', 'USD')])
 
+                def convert_initial_balance(amount):
+                    return self.convert_to_usd(amount)
+
+                def format_initial_balance(amount):
+                    amount_usd = convert_initial_balance(amount)
+                    return report.format_value(amount_usd, currency=usd_currency,
+                                               figure_type='monetary')
+
+                ##NOTE: Do not convert  no_format value otherwise it messes up with calculations
+                initial_balance_line['columns'] = [{'name': format_initial_balance(initial_dict.get('no_format')),
+                                                    'no_format': initial_dict.get('no_format'),
+                                                    'class': 'number'} if initial_dict.get(
+                    'class') == 'number' else initial_dict for initial_dict in initial_balance_line['columns']]
+                lines.append(initial_balance_line)
                 # For the first expansion of the line, the initial balance line gives the progress
                 progress = init_load_more_progress(initial_balance_line)
 

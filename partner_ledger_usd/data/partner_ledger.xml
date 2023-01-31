@@ -90,12 +90,6 @@
                 <field name="figure_type">monetary</field>
                 <field name="blank_if_zero" eval="True"/>
             </record>
-            <record id="partner_ledger_usd_report_amount_currency" model="account.report.column">
-                <field name="name">Amount Currency</field>
-                <field name="expression_label">amount_currency</field>
-                <field name="figure_type">monetary</field>
-                <field name="blank_if_zero" eval="True"/>
-            </record>
             <record id="partner_ledger_usd_report_balance" model="account.report.column">
                 <field name="name">Balance</field>
                 <field name="expression_label">balance</field>
