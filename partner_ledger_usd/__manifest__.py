@@ -13,6 +13,7 @@
     "depends": ['account_reports'],
     "data": [
         'data/partner_ledger.xml',
+        'data/menuitems.xml',
     ],
     "installable": True,
     "auto_install": False,

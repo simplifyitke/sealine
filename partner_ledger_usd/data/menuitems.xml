@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_account_report_partner_ledger" model="ir.actions.client">
+        <field name="name">Partner Ledger USD</field>
+        <field name="tag">account_report</field>
+        <field name="context" eval="{'report_id': ref('partner_ledger_usd.partner_ledger_usd_report')}"/>
+    </record>
+
+    <menuitem id="menu_action_account_report_partner_ledger" name="Partner Ledger USD" parent="account_reports.account_reports_partners_reports_menu"
+              action="action_account_report_partner_ledger" groups="account.group_account_readonly"/>
+</odoo>
